@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - Laundry</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="card auth-box">
+    <h2>Login</h2>
+    <div id="msg" class="msg hidden"></div>
+    <form id="loginForm">
+      <label>Username</label>
+      <input id="username" required>
+      <label>Password</label>
+      <input id="password" type="password" required>
+      <button type="submit">Masuk</button>
+    </form>
+    <p>Belum punya akun? <a href="/register.html">Daftar</a></p>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    localStorage.clear(); // hapus sesi lama
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const data = await api('/auth/login', 'POST', {
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value
+        });
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        location.href = data.user.role === 'admin' ? '/admin/dashboard.html' : '/user/dashboard.html';
+      } catch (err) {
+        notify(err.message, false);
+      }
+    });
+  </script>
+</body>
+</html>

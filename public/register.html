@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar - Laundry</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="card auth-box">
+    <h2>Buat Akun</h2>
+    <div id="msg" class="msg hidden"></div>
+    <form id="registerForm">
+      <label>Nama</label>
+      <input id="name" required>
+      <label>No. Telepon</label>
+      <input id="phone">
+      <label>Alamat</label>
+      <textarea id="address" rows="2"></textarea>
+      <label>Username</label>
+      <input id="username" required>
+      <label>Password (minimal 6 karakter)</label>
+      <input id="password" type="password" minlength="6" required>
+      <button type="submit">Daftar</button>
+    </form>
+    <p>Sudah punya akun? <a href="/login.html">Login</a></p>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await api('/auth/register', 'POST', {
+          name: document.getElementById('name').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          address: document.getElementById('address').value.trim(),
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value
+        });
+        notify('Registrasi berhasil, mengalihkan ke halaman login...');
+        setTimeout(() => location.href = '/login.html', 1500);
+      } catch (err) {
+        notify(err.message, false);
+      }
+    });
+  </script>
+</body>
+</html>

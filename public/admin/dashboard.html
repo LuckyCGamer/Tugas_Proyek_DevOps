@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Admin - Laundry</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Laundry - Admin</h1>
+    <div><span id="hello"></span> <button class="small" onclick="logout()">Keluar</button></div>
+  </header>
+
+  <main class="container">
+    <div id="msg" class="msg hidden"></div>
+
+    <div class="tabs">
+      <button id="btn-customers" onclick="showTab('customers')">Pelanggan</button>
+      <button id="btn-services" onclick="showTab('services')">Layanan</button>
+      <button id="btn-orders" onclick="showTab('orders')">Pesanan</button>
+    </div>
+
+    <!-- ===== PELANGGAN ===== -->
+    <section id="tab-customers">
+      <div class="card">
+        <h2 id="customerFormTitle">Tambah Pelanggan</h2>
+        <form id="customerForm">
+          <input type="hidden" id="cId">
+          <div class="row">
+            <div><label>Nama</label><input id="cName" required></div>
+            <div><label>No. Telepon</label><input id="cPhone"></div>
+          </div>
+          <label>Alamat</label>
+          <input id="cAddress">
+          <div class="row">
+            <div><label>Username</label><input id="cUsername" required></div>
+            <div><label id="cPasswordLabel">Password</label><input id="cPassword" type="password"></div>
+          </div>
+          <button type="submit">Simpan</button>
+          <button type="button" class="gray" onclick="resetCustomerForm()">Batal</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Data Pelanggan</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Nama</th><th>Telepon</th><th>Alamat</th><th>Username</th><th>Aksi</th></tr></thead>
+            <tbody id="customerRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LAYANAN ===== -->
+    <section id="tab-services" class="hidden">
+      <div class="card">
+        <h2 id="serviceFormTitle">Tambah Layanan</h2>
+        <form id="serviceForm">
+          <input type="hidden" id="sId">
+          <div class="row">
+            <div><label>Nama Layanan</label><input id="sName" required></div>
+            <div><label>Harga per Kg (Rp)</label><input id="sPrice" type="number" min="1" required></div>
+          </div>
+          <button type="submit">Simpan</button>
+          <button type="button" class="gray" onclick="resetServiceForm()">Batal</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Data Layanan</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Nama</th><th>Harga per Kg</th><th>Aksi</th></tr></thead>
+            <tbody id="serviceRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PESANAN ===== -->
+    <section id="tab-orders" class="hidden">
+      <div class="card hidden" id="orderFormCard">
+        <h2>Edit Pesanan</h2>
+        <form id="orderForm">
+          <input type="hidden" id="oId">
+          <div class="row">
+            <div><label>Pelanggan</label><select id="oCustomer"></select></div>
+            <div><label>Layanan</label><select id="oService"></select></div>
+            <div><label>Berat (kg)</label><input id="oWeight" type="number" step="0.01" min="0.01" max="999.99" required></div>
+          </div>
+          <button type="submit">Simpan Perubahan</button>
+          <button type="button" class="gray" onclick="closeOrderForm()">Batal</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Semua Pesanan</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Pelanggan</th><th>Layanan</th><th>Berat</th><th>Total</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+            <tbody id="orderRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>
