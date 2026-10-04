@@ -16,6 +16,11 @@ Aplikasi web manajemen laundry (Node.js, Express, MySQL).
 4. Buka http://localhost:3000
 
 ### Jalankan image dari Docker Hub
-Jalankan `docker compose -f docker-compose.hub.yml up -d`. `JWT_SECRET` juga boleh dibiarkan kosong; aplikasi akan membuat secret otomatis dan menyimpannya pada volume `app_data`, sehingga nilainya tetap sama setelah container dibuat ulang.
+1. Salin `.env.example` menjadi `.env`. `DB_PASSWORD` dipakai sebagai password root MySQL di container; `JWT_SECRET` boleh dibiarkan kosong.
+2. Tarik image aplikasi dan database dengan `docker compose -f docker-compose.hub.yml pull`.
+3. Jalankan `docker compose -f docker-compose.hub.yml up -d`.
+4. Compose menjalankan container MySQL dan menginisialisasi database dari `database/init.sql` saat pertama kali dibuat.
 
-Image tersedia di Docker Hub: `luckycgamer/laundry-app`
+Secret JWT yang dibuat otomatis disimpan pada volume `app_data`, sehingga tetap sama setelah container dibuat ulang.
+
+Image aplikasi tersedia di Docker Hub: `luckycgamer/lauzndry-app`
