@@ -18,7 +18,7 @@ services:
       start_period: 30s
 
   app:
-    image: luckycgamer/lauzndry-app:latest   # diambil dari Docker Hub, tanpa build
+    image: luckycgamer/laundry-app:latest    # diambil dari Docker Hub, tanpa build
     pull_policy: always                  # selalu cek versi terbaru
     container_name: laundry-app
     restart: unless-stopped

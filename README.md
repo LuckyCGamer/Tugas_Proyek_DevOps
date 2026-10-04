@@ -23,4 +23,4 @@ Aplikasi web manajemen laundry (Node.js, Express, MySQL).
 
 Secret JWT yang dibuat otomatis disimpan pada volume `app_data`, sehingga tetap sama setelah container dibuat ulang.
 
-Image aplikasi tersedia di Docker Hub: `luckycgamer/lauzndry-app`
+Image aplikasi tersedia di Docker Hub: `luckycgamer/laundry-app`
