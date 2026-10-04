@@ -19,7 +19,7 @@ Aplikasi web manajemen laundry (Node.js, Express, MySQL).
 1. Salin `.env.example` menjadi `.env`. `DB_PASSWORD` dipakai sebagai password root MySQL di container; `JWT_SECRET` boleh dibiarkan kosong.
 2. Tarik image aplikasi dan database dengan `docker compose -f docker-compose.hub.yml pull`.
 3. Jalankan `docker compose -f docker-compose.hub.yml up -d`.
-4. Compose menjalankan container MySQL dan menginisialisasi database dari `database/init.sql` saat pertama kali dibuat.
+4. Docker Desktop menampilkan project `test` dengan container `db-1` dan `app-1`. Compose menjalankan MySQL dan menginisialisasi database dari `database/init.sql` saat pertama kali dibuat.
 
 Secret JWT yang dibuat otomatis disimpan pada volume `app_data`, sehingga tetap sama setelah container dibuat ulang.
 
