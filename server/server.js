@@ -3,15 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const pool = require('./db/connection');
+const initDatabase = require('./db/init');
+const ensureJwtSecret = require('./utils/secret');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-// Server tidak boleh jalan tanpa JWT_SECRET
-if (!process.env.JWT_SECRET) {
-  console.error('JWT_SECRET belum diisi di file .env');
-  process.exit(1);
-}
+ensureJwtSecret(); // isi JWT_SECRET otomatis jika belum ada
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +31,14 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
+async function start() {
+  await initDatabase();   // tunggu MySQL dan siapkan tabel dulu
+  app.listen(PORT, () => {
+    console.log(`Server berjalan di http://localhost:${PORT}`);
+  });
+}
+
+start().catch((err) => {
+  console.error('Gagal memulai server:', err.message);
+  process.exit(1);
 });
