@@ -32,8 +32,11 @@ services:
       DB_USER: root
       DB_PASSWORD: ${DB_PASSWORD:-laundry_root_123}
       DB_NAME: ${DB_NAME:-laundry_db}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET belum diisi di file .env}
+      JWT_SECRET: ${JWT_SECRET:-}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+    volumes:
+      - app_data:/app/data
 
 volumes:
   db_data:
+  app_data:
