@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: laundry-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-laundry_root_123}
+      MYSQL_DATABASE: ${DB_NAME:-laundry_db}
+    volumes:
+      - db_data:/var/lib/mysql
+      # file .sql di folder ini dijalankan otomatis saat database pertama kali dibuat
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  app:
+    build: .
+    image: USERNAME/laundry-app:latest
+    container_name: laundry-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy   # app baru jalan setelah MySQL siap
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: db                    # nama service MySQL, bukan localhost
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-laundry_root_123}
+      DB_NAME: ${DB_NAME:-laundry_db}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET belum diisi di file .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+
+volumes:
+  db_data:
