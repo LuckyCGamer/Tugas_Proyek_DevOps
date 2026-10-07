@@ -10,7 +10,7 @@ services:
 
   app:
     image: luckycgamer/laundry-app:latest
-    build: .                        # hanya dipakai saat development; boleh dihapus
+    build: .                        
     restart: unless-stopped
     depends_on:
       - db
@@ -22,7 +22,7 @@ services:
       DB_PASSWORD: laundry_root_123
       DB_NAME: laundry_db
     volumes:
-      - app_data:/app/data          # menyimpan JWT secret otomatis
+      - app_data:/app/data          
 
 volumes:
   db_data:

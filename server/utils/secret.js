@@ -2,9 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-// Jika JWT_SECRET sudah diisi (misal lewat .env), pakai itu.
-// Jika belum, buat secret acak dan simpan di data/jwt.secret
-// supaya tidak berubah saat container direstart (token login tetap valid).
 module.exports = function ensureJwtSecret() {
   if (process.env.JWT_SECRET) return;
 
