@@ -8,21 +8,30 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
-  app:
-    image: luckycgamer/laundry-app:latest
-    build: .                        
+  backend:
+    image: luckycgamer/laundry-backend:latest
+    build: .
     restart: unless-stopped
     depends_on:
       - db
-    ports:
-      - "3000:3000"
     environment:
       DB_HOST: db
       DB_USER: root
       DB_PASSWORD: laundry_root_123
       DB_NAME: laundry_db
     volumes:
-      - app_data:/app/data          
+      - app_data:/app/data
+
+  frontend:
+    image: luckycgamer/laundry-frontend:latest
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
 
 volumes:
   db_data:
