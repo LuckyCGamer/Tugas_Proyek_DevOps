@@ -9,8 +9,8 @@ services:
       - db_data:/var/lib/mysql
 
   backend:
-    image: luckycgamer/laundry-backend:latest
-    build: .
+    image: luckycgamer/laundry-app:latest
+    command: ["node", "server/server.js"]
     restart: unless-stopped
     depends_on:
       - db
@@ -23,10 +23,8 @@ services:
       - app_data:/app/data
 
   frontend:
-    image: luckycgamer/laundry-frontend:latest
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: luckycgamer/laundry-app:latest
+    command: ["nginx", "-g", "daemon off;"]
     restart: unless-stopped
     depends_on:
       - backend
