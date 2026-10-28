@@ -38,7 +38,7 @@ async function loadOrders() {
           <td><span class="badge ${esc(o.status)}">${esc(o.status)}</span></td>
           <td>${formatDate(o.created_at)}</td>
           <td>
-            ${o.status === 'Pending' ? `<button class="btn danger" onclick="cancelOrder(${o.id})">Batal</button>` : '<button class="btn danger" disabled onclick="cancelOrder(${o.id})">Batal</button>'}
+            ${o.status === 'Pending' ? `<button class="btn danger" onclick="cancelOrder(${o.id})">Batal</button>` : ''}
           </td>
         </tr>`).join('')
     : '<tr><td colspan="7">Belum ada pesanan</td></tr>';
