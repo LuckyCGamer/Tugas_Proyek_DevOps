@@ -81,3 +81,31 @@ exports.getMyOrders = async (req, res) => {
     res.json(rows);
   } catch (err) { serverError(res, err); }
 };
+
+exports.cancelOrder = async (req, res) => {
+  try {
+    const orderId = Number(req.params.id);
+    if (!Number.isInteger(orderId) || orderId < 1) {
+      return res.status(400).json({ message: 'ID pesanan tidak valid' });
+    }
+
+    const [rows] = await pool.query(
+      'SELECT status FROM orders WHERE id = ? AND user_id = ?',
+      [orderId, req.user.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ message: 'Pesanan tidak ditemukan' });
+    if (rows[0].status !== 'Pending') return res.status(400).json({ message: 'Hanya pesanan Pending yang bisa dibatalkan' });
+
+    const [result] = await pool.query(
+      "DELETE FROM orders WHERE id = ? AND user_id = ?",
+      [orderId, req.user.id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: 'Hanya pesanan Pending yang bisa dibatalkan' });
+    }
+
+    res.json({ message: 'Pesanan berhasil dibatalkan' });
+  } catch (err) {
+    serverError(res, err);
+  }
+};

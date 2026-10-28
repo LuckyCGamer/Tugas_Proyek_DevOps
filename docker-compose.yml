@@ -10,7 +10,8 @@ services:
 
   backend:
     image: luckycgamer/laundry-app:latest
-    command: ["node", "server/server.js"]
+    entrypoint: ["node"]
+    command: ["server/server.js"]
     restart: unless-stopped
     depends_on:
       - db
@@ -23,13 +24,15 @@ services:
       - app_data:/app/data
 
   frontend:
-    image: luckycgamer/laundry-app:latest
-    command: ["nginx", "-g", "daemon off;"]
+    image: nginx:alpine
     restart: unless-stopped
     depends_on:
       - backend
     ports:
       - "3000:80"
+    volumes:
+      - ./public:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   db_data:

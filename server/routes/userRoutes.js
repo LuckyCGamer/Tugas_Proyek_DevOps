@@ -10,5 +10,6 @@ router.get('/profile', user.getProfile);
 router.put('/profile', user.updateProfile);
 router.post('/orders', user.createOrder);
 router.get('/orders', user.getMyOrders);
+router.delete('/orders/:id', user.cancelOrder);
 
 module.exports = router;
