@@ -8,11 +8,14 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Push the image to Docker Hub (only used if the docker job at the bottom is uncommented)"
+        description: "Push the image to Docker Hub"
         type: boolean
         default: false
+      tag:
+        description: "Extra image tag, e.g. v1.0 (optional)"
+        type: string
+        default: ""
 
-# One active run per branch; an older run is cancelled when a new push arrives
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -21,8 +24,23 @@ permissions:
   contents: read
 
 jobs:
+  secrets:
+    name: Secret scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   test:
     name: Test (syntax, lint, unit test)
+    needs: secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -45,20 +63,6 @@ jobs:
 
       - name: Unit test (skipped if there is no test script)
         run: npm test --if-present
-
-  secrets:
-    name: Secret scan (Gitleaks)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Scan for committed secrets
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   smoke:
     name: Smoke test (app + MySQL)
@@ -167,6 +171,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha
+            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
   
       - name: Build and push image
         uses: docker/build-push-action@v6
