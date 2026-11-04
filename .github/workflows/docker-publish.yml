@@ -132,7 +132,7 @@ jobs:
     # Manual only: Actions tab, Run workflow, tick "publish".
     # To publish on every push to main instead, use:
     # if: github.event_name == 'push'
-    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
