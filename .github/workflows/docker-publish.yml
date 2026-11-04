@@ -25,9 +25,6 @@ permissions:
   contents: read
 
 jobs:
-  # ---------------------------------------------------------------
-  # 1. TEST: syntax, lint, unit test
-  # ---------------------------------------------------------------
   test:
     name: Test (syntax, lint, unit test)
     runs-on: ubuntu-latest
@@ -53,9 +50,6 @@ jobs:
       - name: Unit test (skipped if there is no test script)
         run: npm test --if-present
 
-  # ---------------------------------------------------------------
-  # 2. Secret scan: Passwords, tokens or API keys accidentally committed
-  # ---------------------------------------------------------------
   secrets:
     name: Secret scan (Gitleaks)
     runs-on: ubuntu-latest
@@ -70,11 +64,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ---------------------------------------------------------------
-  # 3. SMOKE TEST: start the real app against a MySQL service
-  #    and check /api/health
-  #    Adjust the env values below to match your app's .env
-  # ---------------------------------------------------------------
   smoke:
     name: Smoke test (app + MySQL)
     needs: test
@@ -141,20 +130,13 @@ jobs:
         if: failure()
         run: cat app.log
 
-  # ===============================================================
-  # DOCKER JOB (last job) - currently DISABLED.
-  # To enable: select ONLY the lines from "# docker:" below to the
-  # end of the file and uncomment them (VS Code: Ctrl+/).
-  # To disable again: comment those same lines.
-  # Do not uncomment this banner.
-  # ===============================================================
   docker:
     name: Docker (build and push to Docker Hub)
     needs: [test, secrets, smoke]
     # Manual only: Actions tab, Run workflow, tick "publish".
     # To publish on every push to main instead, use:
-    if: github.event_name == 'workflow_dispatch' && inputs.publish
     # if: github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
