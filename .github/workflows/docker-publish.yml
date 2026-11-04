@@ -11,10 +11,6 @@ on:
         description: "Push the image to Docker Hub (only used if the docker job at the bottom is uncommented)"
         type: boolean
         default: false
-      tag:
-        description: "Extra image tag, e.g. v1.0 (optional)"
-        type: string
-        default: ""
 
 # One active run per branch; an older run is cancelled when a new push arrives
 concurrency:
@@ -165,10 +161,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            type=raw,value=latest
-            type=sha
-            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
