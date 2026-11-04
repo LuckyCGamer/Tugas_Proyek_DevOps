@@ -11,6 +11,10 @@ on:
         description: "Push the image to Docker Hub (only used if the docker job at the bottom is uncommented)"
         type: boolean
         default: false
+      tag:
+        description: "Extra image tag, e.g. v1.0 (optional)"
+        type: string
+        default: ""
 
 # One active run per branch; an older run is cancelled when a new push arrives
 concurrency:
@@ -50,28 +54,21 @@ jobs:
         run: npm test --if-present
 
   # ---------------------------------------------------------------
-  # 2. SECURITY: scan npm dependencies for known vulnerabilities
+  # 2. Secret scan: Passwords, tokens or API keys accidentally committed
   # ---------------------------------------------------------------
-  security:
-    name: Security (npm audit)
+  secrets:
+    name: Secret scan (Gitleaks)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Audit production dependencies (HIGH and CRITICAL)
-        # Report only. Remove "continue-on-error" to make the pipeline fail on findings
-        continue-on-error: true
-        run: npm audit --omit=dev --audit-level=high
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ---------------------------------------------------------------
   # 3. SMOKE TEST: start the real app against a MySQL service
@@ -144,49 +141,52 @@ jobs:
         if: failure()
         run: cat app.log
 
-  # # ===============================================================
-  # # DOCKER JOB (last job) - currently DISABLED.
-  # # To enable: select ONLY the lines from "# docker:" below to the
-  # # end of the file and uncomment them (VS Code: Ctrl+/).
-  # # To disable again: comment those same lines.
-  # # Do not uncomment this banner.
-  # # ===============================================================
-  # docker:
-  #   name: Docker (build and push to Docker Hub)
-  #   needs: [test, security, smoke]
-  #   # Manual only: Actions tab, Run workflow, tick "publish".
-  #   # To publish on every push to main instead, use:
-  #   # if: github.event_name == 'workflow_dispatch' && inputs.publish
-  #   if: github.event_name == 'push'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
+  # ===============================================================
+  # DOCKER JOB (last job) - currently DISABLED.
+  # To enable: select ONLY the lines from "# docker:" below to the
+  # end of the file and uncomment them (VS Code: Ctrl+/).
+  # To disable again: comment those same lines.
+  # Do not uncomment this banner.
+  # ===============================================================
+  docker:
+    name: Docker (build and push to Docker Hub)
+    needs: [test, secrets, smoke]
+    # Manual only: Actions tab, Run workflow, tick "publish".
+    # To publish on every push to main instead, use:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    # if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
   
-  #     - name: Log in to Docker Hub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
   
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
   
-  #     - name: Generate image tags
-  #       id: meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ${{ secrets.DOCKERHUB_USERNAME }}/laundry-app
-  #         tags: |
-  #           type=raw,value=latest
-  #           type=sha
+      - name: Generate image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/laundry-app
+          tags: |
+            type=raw,value=latest
+            type=sha
   
-  #     - name: Build and push image
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: .
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-  #         cache-from: type=gha
-  #         cache-to: type=gha,mode=max
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            type=raw,value=latest
+            type=sha
+            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
