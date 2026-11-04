@@ -143,8 +143,8 @@ jobs:
 
   docker:
     name: Docker (build and push to Docker Hub)
-    needs: [test, secrets, smoke]
-    if: github.event_name != 'pull_request'
+    needs: [test, secrets, config, smoke]
+    if: github.event_name == 'workflow_dispatch' && inputs.publish == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
