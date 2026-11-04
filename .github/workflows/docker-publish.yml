@@ -11,6 +11,10 @@ on:
         description: "Push the image to Docker Hub (only used if the docker job at the bottom is uncommented)"
         type: boolean
         default: false
+      tag:
+        description: "Extra image tag, e.g. v1.0 (optional)"
+        type: string
+        default: ""
 
 # One active run per branch; an older run is cancelled when a new push arrives
 concurrency:
@@ -132,7 +136,7 @@ jobs:
     # Manual only: Actions tab, Run workflow, tick "publish".
     # To publish on every push to main instead, use:
     # if: github.event_name == 'push'
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -155,6 +159,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha
+            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
   
       - name: Build and push image
         uses: docker/build-push-action@v6
