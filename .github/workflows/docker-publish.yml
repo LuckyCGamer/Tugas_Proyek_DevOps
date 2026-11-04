@@ -126,6 +126,21 @@ jobs:
         if: failure()
         run: cat app.log
 
+  config:
+    name: Validate Docker files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: docker compose config -q
+
+      - name: Lint Dockerfile (Hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
   docker:
     name: Docker (build and push to Docker Hub)
     needs: [test, secrets, smoke]
