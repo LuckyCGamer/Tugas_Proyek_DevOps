@@ -37,12 +37,13 @@ async function loadOrders() {
           <td>${rupiah(o.total_price)}</td>
           <td><span class="badge ${esc(o.status)}">${esc(o.status)}</span></td>
           <td>${formatDate(o.created_at)}</td>
-          <td>
-            ${o.status === 'Pending' ? `<button class="btn danger" onclick="cancelOrder(${o.id})">Batal</button>` : ''}
-          </td>
         </tr>`).join('')
     : '<tr><td colspan="7">Belum ada pesanan</td></tr>';
 }
+
+          // <td>
+          //   ${o.status === 'Pending' ? `<button class="btn danger" onclick="cancelOrder(${o.id})">Batal</button>` : ''}
+          // </td>
 
 async function cancelOrder(orderId) {
   if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {

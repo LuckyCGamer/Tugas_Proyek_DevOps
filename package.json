@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server/server.js",
     "dev": "node --watch server/server.js",
-    "hash-passwords": "node server/db/hash-passwords.js"
+    "hash-passwords": "node server/db/hash-passwords.js",
+    "test": "node --test"
   },
   "repository": {
     "type": "git",
