@@ -40,6 +40,7 @@ jobs:
 
   test:
     name: Test (syntax, lint, unit test)
+    needs: secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -65,7 +66,7 @@ jobs:
 
   smoke:
     name: Smoke test (app + MySQL)
-    needs: [test]
+    needs: [secrets, test]
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -146,7 +147,7 @@ jobs:
 
   docker:
     name: Docker (build and push to Docker Hub)
-    needs: [test, config, smoke]
+    needs: [test, secrets, config, smoke]
     if: github.event_name == 'workflow_dispatch' && inputs.publish == true
     runs-on: ubuntu-latest
     steps:
