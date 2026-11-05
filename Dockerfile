@@ -1,5 +1,5 @@
 FROM node:20-alpine
-RUN apk add --no-cache nginx && mkdir -p /run/nginx
+RUN apk add --no-cache nginx=1.28.3-r7 && mkdir -p /run/nginx
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
